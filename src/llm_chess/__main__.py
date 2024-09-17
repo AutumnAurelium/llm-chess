@@ -91,30 +91,16 @@ class Message(TypedDict):
 
 load_dotenv()
 
-api_key = os.getenv("API_KEY")
-
-# client = OpenAI(
-#     base_url="https://openrouter.ai/api/v1",
-#     api_key=api_key,
-# )
-
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1/",
     api_key=os.getenv("GROQ_KEY"),
 )
 
-delay = 0
-
-last_msg = datetime.now()
-
 tokens_in = 0
 tokens_out = 0
 
 def chat(messages: List[Message], model = "llama-3.1-70b-versatile") -> str:
-    global tokens_in, tokens_out, last_msg
-    
-    if datetime.now().timestamp() - last_msg.timestamp() < delay:
-        time.sleep(delay)
+    global tokens_in, tokens_out
     
     response = client.chat.completions.create(
         model=model,
@@ -127,8 +113,6 @@ def chat(messages: List[Message], model = "llama-3.1-70b-versatile") -> str:
     
     tokens_in += response.usage.prompt_tokens
     tokens_out += response.usage.completion_tokens
-    
-    last_timestamp = datetime.now()
     
     return response.choices[0].message.content
 
